@@ -12,7 +12,7 @@ namespace AI_Strategy
          */
         public override void Move()
         {
-            if (speed > 0 && posY < PlayerLane.HEIGHT - 1)
+            if (speed > 0 && posY < PlayerLane.HEIGHT)
             {
                 int x = posX;
                 int y = posY;

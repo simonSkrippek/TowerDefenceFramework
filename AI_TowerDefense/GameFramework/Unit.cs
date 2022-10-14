@@ -82,11 +82,11 @@ namespace GameFramework
             // kill unit and award gold
             
             unit.health = 0;
-            unit.posX = -1;
-            unit.posY = -1;
-            Cell.Unit = null;
+            unit.Cell.Unit = null;
             lane.RemoveUnit(unit);
             player.Earn(unit);
+            unit.posX = -1;
+            unit.posY = -1;
         }
 
         protected virtual bool TryGetTarget(out Unit unit)
@@ -125,22 +125,29 @@ namespace GameFramework
             {
                 return false; // illegal move!
             }
-            Cell oldCell = Cell;
-            Cell newCell = lane.GetCellAt(x, y);
-            
-            if (newCell is not { Unit: null })
+
+            // if the cell is past the lane, we allow movement. the unit will be cleaned up in checkDestination
+            if (y < PlayerLane.HEIGHT && y >= 0)
             {
-                return false;
+                // otherwise, we check if the target cell is empty, and if so, set this unit on it
+                if (lane.GetCellAt(x, y) is { Unit: null } cell)
+                {
+                    cell.Unit = this;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                var i = 0;
             }
 
-            if(oldCell != null)
-            {
-                oldCell.Unit = null;
-            }
-
-            newCell.Unit = this;
+            Cell.Unit = null;
             posX = x;
             posY = y;
+            
             return true;
         }
 
@@ -177,7 +184,7 @@ namespace GameFramework
          */
         public void CheckDestination()
         {
-            if (speed > 0 && posY >= PlayerLane.HEIGHT - 1)
+            if (speed > 0 && posY >= PlayerLane.HEIGHT)
             {
                 player.Earn(this);
                 player.IncScore();
