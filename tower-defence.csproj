@@ -1,0 +1,79 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{4A7CE833-FBC1-484C-A630-09761A53194E}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ConsoleApplication</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>tower_defence</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AI_TowerDefense\.DS_Store" />
+    <None Include="AI_TowerDefense\.vs\AI_TowerDefense\v16\.suo" />
+    <None Include="AI_TowerDefense\.vs\ProjectSettings.json" />
+    <None Include="AI_TowerDefense\.vs\slnx.sqlite" />
+    <None Include="AI_TowerDefense\.vs\VSWorkspaceState.json" />
+    <None Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.deps.json" />
+    <None Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.runtimeconfig.dev.json" />
+    <None Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.runtimeconfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AI_TowerDefense\AI_Strategy\AbstractStrategy.cs" />
+    <Compile Include="AI_TowerDefense\AI_Strategy\MySoldier.cs" />
+    <Compile Include="AI_TowerDefense\AI_Strategy\RandomStrategy.cs" />
+    <Compile Include="AI_TowerDefense\AI_Strategy\RandomStrategyLoggerDemo.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\Cell.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\Loging\DebugLoger.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\Loging\LogCache.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\Player.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\PlayerLane.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\Soldier.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\Tower.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\Unit.cs" />
+    <Compile Include="AI_TowerDefense\Program.cs" />
+    <Compile Include="AI_TowerDefense\TowerDefense.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.dll" />
+    <Content Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.exe" />
+    <Content Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\logs.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>
