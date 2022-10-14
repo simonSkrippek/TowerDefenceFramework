@@ -87,13 +87,13 @@ namespace GameFramework
          */
         public void RemoveUnit(Unit unit)
         {
-            if (unit is Soldier)
+            if (unit is Soldier soldier)
             {
-                soldiers.Remove((Soldier)unit);
+                soldiers.Remove(soldier);
             }
-            else if (unit is Tower)
+            else if (unit is Tower tower)
             {
-                towers.Remove((Tower)unit);
+                towers.Remove(tower);
             }
         }
 

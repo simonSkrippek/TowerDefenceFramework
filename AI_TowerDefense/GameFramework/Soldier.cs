@@ -9,8 +9,16 @@
      */
     public class Soldier : Unit
     {
-        public Soldier(Player player, PlayerLane lane, int x) : base(player, lane)
+        public static TSoldier CreateSoldier<TSoldier> (Player player, PlayerLane lane, int x) where TSoldier : Soldier, new()
         {
+            var soldier = new TSoldier();
+            soldier.Initialize(player, lane, x);
+            return soldier;
+        }
+
+        protected virtual void Initialize(Player player, PlayerLane lane, int x)
+        {
+            base.Initialize(player, lane);
             speed = 1;
             health = 6;
             damageCaused = 1;

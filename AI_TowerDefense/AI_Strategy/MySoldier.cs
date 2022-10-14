@@ -7,10 +7,6 @@ namespace AI_Strategy
      */
     public class MySoldier : Soldier
     {
-        public MySoldier(Player player, PlayerLane lane, int x) : base(player, lane, x)
-        {
-        }
-
         /*
          * This move method is a mere copy of the base movement method.
          */

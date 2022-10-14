@@ -145,43 +145,11 @@ namespace AI_TowerDefense
 
                 PrintLanes();
 
-                DebugLoger.RenderCache();
+                DebugLogger.RenderCache();
                 Thread.Sleep(this.fastSpeedActivated ? FAST_SPEED_MS : NORMAL_SPEED_MS);
             }
 
             Console.ReadKey();
-        }
-
-        public static Soldier CreateSoldier(Player player, PlayerLane lane, int x)
-        {
-            if ("A".Equals(player.Name))
-            {
-                return CreatePlayerASoldier(player, lane, x);
-            }
-            if ("B".Equals(player.Name))
-            {
-                return CreatePlayerBSoldier(player, lane, x);
-            }
-            return null;
-        }
-
-
-        /*
-         * creates a new Soldier for player A (player A uses Soldier), adapt class used for your test runs.
-         */
-        protected static Soldier CreatePlayerASoldier(Player player, PlayerLane lane, int x)
-        {
-            Soldier soldier = new MySoldier(player, lane, x);
-            return soldier;
-        }
-
-        /*
-         * creates a new Soldier for player B (player B uses MySoldier), adapt class used for your test runs.
-         */
-        protected static Soldier CreatePlayerBSoldier(Player player, PlayerLane lane, int x)
-        {
-            Soldier soldier = new MySoldier(player, lane, x);
-            return soldier;
         }
 
 

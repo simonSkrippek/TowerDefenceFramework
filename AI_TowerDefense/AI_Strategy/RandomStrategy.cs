@@ -33,7 +33,7 @@ namespace AI_Strategy
                     if (defendLane.GetCellAt(x, y).Unit == null)
                     {
                         //positioned = true;
-                        Tower tower = player.BuyTower(defendLane, x, y);
+                        player.TryBuyTower<Tower>(defendLane, x, y);
                     }
                 }
             }
@@ -49,7 +49,7 @@ namespace AI_Strategy
             while (player.Gold > 5 && round < 5)
             {
                 round++;
-                Boolean positioned = false;
+                bool positioned = false;
                 int count = 0;
                 while (!positioned && count < 10)
                 {
@@ -59,7 +59,7 @@ namespace AI_Strategy
                     if (attackLane.GetCellAt(x, y).Unit == null)
                     {
                         positioned = true;
-                        Soldier soldier = player.BuySoldier(attackLane, x);
+                        player.TryBuySoldier<MySoldier>(attackLane, x);
                     }
                 }
             }

@@ -24,7 +24,7 @@ namespace AI_Strategy
         {
             if (player.Gold > 8)
             {
-                Boolean positioned = false;
+                bool positioned = false;
                 int count = 0;
                 while (!positioned && count < 20)
                 {
@@ -34,7 +34,7 @@ namespace AI_Strategy
                     if (defendLane.GetCellAt(x, y).Unit == null)
                     {
                         positioned = true;
-                        Tower tower = player.BuyTower(defendLane, x, y);
+                        player.TryBuyTower<Tower>(defendLane, x, y);
                     }
                 }
             }
@@ -48,12 +48,12 @@ namespace AI_Strategy
         {
 
           //DebugLoger.Log(Tower.GetNextTowerCosts(defendLane));
-            DebugLoger.Log("#" + messageCounter + " Deployed Soldier!");
+            DebugLogger.Log("#" + messageCounter + " Deployed Soldier!");
             messageCounter++;
 
             while (messageCounter > 5 && messageCounter <= 15)
             {
-                DebugLoger.Log("#" + messageCounter + " " + random.Next(1000), true);
+                DebugLogger.Log("#" + messageCounter + " " + random.Next(1000), true);
                 //DebugLoger.Log("#" + messageCounter + ": " + random.Next(1000));
                 messageCounter++;
 
@@ -64,7 +64,7 @@ namespace AI_Strategy
             while (player.Gold > 5 && round < 5)
             {
                 round++;
-                Boolean positioned = false;
+                bool positioned = false;
                 int count = 0;
                 while (!positioned && count < 10)
                 {
@@ -74,7 +74,7 @@ namespace AI_Strategy
                     if (attackLane.GetCellAt(x, y).Unit == null)
                     {
                         positioned = true;
-                        Soldier soldier = player.BuySoldier(attackLane, x);
+                        player.TryBuySoldier<MySoldier>(attackLane, x, out var soldier);
                     }
                 }
             }
