@@ -112,6 +112,12 @@ namespace GameFramework
             return true;
         }
 
+        public enum TowerPlacementResult
+        {
+            Success,
+            CellOccupied,
+            CellForbidden,
+        }
         /*
          * Towers can be placed anywhere in the field, except the opponent's
          * soldier deploy lane, which is at y = 0.
@@ -125,23 +131,22 @@ namespace GameFramework
         public bool TryBuyTower<TTower>(int x, int y) where TTower : Tower, new() => TryBuyTower<TTower>(x, y, out _);
         public bool TryBuyTower<TTower>(int x, int y, out TTower tower) where TTower : Tower, new()
         {
-            if (
+            var isOutOfBounds = 
                 y < PlayerLane.HEIGHT_OF_SAFETY_ZONE 
                 || y >= PlayerLane.HEIGHT 
                 || x < 0 
-                || x >= PlayerLane.WIDTH 
-                || HomeLane.GetCellAt(x, y).Unit != null 
-                // 
-                // || y % 2 == 0 
-                // || x % 2 != 0
-                )
+                || x >= PlayerLane.WIDTH;
+            var isOccupied = HomeLane.GetCellAt(x, y).Unit != null;
+            // || y % 2 == 0 
+            // || x % 2 != 0
+            if (isOutOfBounds || isOccupied)
             {
                 tower = null;
                 return false;
             }
 
             tower = Tower.CreateTower<TTower>(this, HomeLane, x, y);
-            if (!TryPayCost(tower.Cost + HomeLane.TowerCount()))
+            if (!TryPayCost(Tower.GetNextTowerCosts(HomeLane)))
             {
                 return false;
             }
