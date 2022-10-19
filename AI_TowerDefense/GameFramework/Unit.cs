@@ -160,7 +160,7 @@ namespace GameFramework
          */
         public virtual void Move()
         {
-            if (speed > 0 && posY < PlayerLane.HEIGHT - 1)
+            if (speed > 0)
             {
                 int x = posX;
                 int y = posY;
