@@ -12,7 +12,7 @@ namespace AI_Strategy
         private int messageCounter = 1;
         private static Random random = new Random();
 
-        public RandomStrategyLoggerDemo(PlayerLane defendLane, PlayerLane attackLane, Player player) : base(defendLane, attackLane, player)
+        public RandomStrategyLoggerDemo(Player player) : base(player)
         {
         }
 
@@ -31,10 +31,10 @@ namespace AI_Strategy
                     count++;
                     int x = random.Next(PlayerLane.WIDTH);
                     int y = random.Next(PlayerLane.HEIGHT - PlayerLane.HEIGHT_OF_SAFETY_ZONE) + PlayerLane.HEIGHT_OF_SAFETY_ZONE;
-                    if (defendLane.GetCellAt(x, y).Unit == null)
+                    if (player.HomeLane.GetCellAt(x, y).Unit == null)
                     {
                         positioned = true;
-                        player.TryBuyTower<Tower>(defendLane, x, y);
+                        player.TryBuyTower<Tower>(x, y);
                     }
                 }
             }
@@ -51,7 +51,7 @@ namespace AI_Strategy
             DebugLogger.Log("#" + messageCounter + " Deployed Soldier!");
             messageCounter++;
 
-            while (messageCounter > 5 && messageCounter <= 15)
+            while (messageCounter is > 5 and <= 15)
             {
                 DebugLogger.Log("#" + messageCounter + " " + random.Next(1000), true);
                 //DebugLoger.Log("#" + messageCounter + ": " + random.Next(1000));
@@ -71,10 +71,10 @@ namespace AI_Strategy
                     count++;
                     int x = random.Next(PlayerLane.WIDTH);
                     int y = 0;
-                    if (attackLane.GetCellAt(x, y).Unit == null)
+                    if (player.EnemyLane.GetCellAt(x, y).Unit == null)
                     {
                         positioned = true;
-                        player.TryBuySoldier<MySoldier>(attackLane, x, out var soldier);
+                        player.TryBuySoldier<MySoldier>(x, out var soldier);
                     }
                 }
             }

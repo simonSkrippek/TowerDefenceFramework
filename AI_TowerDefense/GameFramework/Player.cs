@@ -49,6 +49,9 @@ namespace GameFramework
                 return score;
             }
         }
+        
+        public PlayerLane HomeLane { get; }
+        public PlayerLane EnemyLane { get; }
 
         /*
          * Automatically called by the game play. Forbidden to use as part of
@@ -56,9 +59,11 @@ namespace GameFramework
          * 
          * creates a new player.
          */
-        public Player(string name)
+        public Player(string name, PlayerLane homeLane, PlayerLane targetLane)
         {
             this.name = name;
+            HomeLane = homeLane;
+            EnemyLane = targetLane;
         }
 
         /*
@@ -87,23 +92,23 @@ namespace GameFramework
          * If the soldier is placed outside the soldier deploy lane, or on
          * an non-empty field, false is returned.
          */
-        public bool TryBuySoldier<TSoldier>(PlayerLane lane, int x) where TSoldier : Soldier, new() => TryBuySoldier<TSoldier>(lane, x, out _);
-        public bool TryBuySoldier<TSoldier>(PlayerLane lane, int x, out TSoldier soldier) where TSoldier : Soldier, new()
+        public bool TryBuySoldier<TSoldier>(int x) where TSoldier : Soldier, new() => TryBuySoldier<TSoldier>( x, out _);
+        public bool TryBuySoldier<TSoldier>(int x, out TSoldier soldier) where TSoldier : Soldier, new()
         {
-            if (x < 0 || x > PlayerLane.WIDTH || lane.GetCellAt(x, 0).Unit != null)
+            if (x < 0 || x > PlayerLane.WIDTH || EnemyLane.GetCellAt(x, 0).Unit != null)
             {
                 soldier = null;
                 return false;
             }
 
-            soldier = Soldier.CreateSoldier<TSoldier>(this, lane, x);
+            soldier = Soldier.CreateSoldier<TSoldier>(this, EnemyLane, x);
             if (!TryPayCost(soldier.Cost))
             {
                 return false;
             }
 
-            lane.GetCellAt(x, 0).Unit = soldier;
-            lane.AddUnit(soldier);
+            EnemyLane.GetCellAt(x, 0).Unit = soldier;
+            EnemyLane.AddUnit(soldier);
             return true;
         }
 
@@ -117,15 +122,15 @@ namespace GameFramework
          * If the tower is placed outside the lane, inside the safety zone, or on
          * an non-empty field, null is returned.
          */
-        public bool TryBuyTower<TTower>(PlayerLane lane, int x, int y) where TTower : Tower, new() => TryBuyTower<TTower>(lane, x, y, out _);
-        public bool TryBuyTower<TTower>(PlayerLane lane, int x, int y, out TTower tower) where TTower : Tower, new()
+        public bool TryBuyTower<TTower>(int x, int y) where TTower : Tower, new() => TryBuyTower<TTower>(x, y, out _);
+        public bool TryBuyTower<TTower>(int x, int y, out TTower tower) where TTower : Tower, new()
         {
             if (
                 y < PlayerLane.HEIGHT_OF_SAFETY_ZONE 
                 || y >= PlayerLane.HEIGHT 
                 || x < 0 
                 || x >= PlayerLane.WIDTH 
-                || lane.GetCellAt(x, y).Unit != null 
+                || HomeLane.GetCellAt(x, y).Unit != null 
                 // 
                 // || y % 2 == 0 
                 // || x % 2 != 0
@@ -135,14 +140,14 @@ namespace GameFramework
                 return false;
             }
 
-            tower = Tower.CreateTower<TTower>(this, lane, x, y);
-            if (!TryPayCost(tower.Cost + lane.TowerCount()))
+            tower = Tower.CreateTower<TTower>(this, HomeLane, x, y);
+            if (!TryPayCost(tower.Cost + HomeLane.TowerCount()))
             {
                 return false;
             }
 
-            lane.GetCellAt(x, y).Unit = tower;
-            lane.AddUnit(tower);
+            HomeLane.GetCellAt(x, y).Unit = tower;
+            HomeLane.AddUnit(tower);
             return true;
 
         }
