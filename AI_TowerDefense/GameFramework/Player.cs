@@ -146,27 +146,22 @@ namespace GameFramework
         public TowerPlacementResult TryBuyTower<TTower>(int x, int y) where TTower : Tower, new() => TryBuyTower<TTower>(x, y, out _);
         public TowerPlacementResult TryBuyTower<TTower>(int x, int y, out TTower tower) where TTower : Tower, new()
         {
-            var isOutOfBounds = 
-                y < PlayerLane.HEIGHT_OF_SAFETY_ZONE 
+            if (y < PlayerLane.HEIGHT_OF_SAFETY_ZONE 
                 || y >= PlayerLane.HEIGHT 
                 || x < 0 
-                || x >= PlayerLane.WIDTH;
-            
-            if (isOutOfBounds)
+                || x >= PlayerLane.WIDTH)
             {
                 tower = null;
                 return TowerPlacementResult.OutOfBounds;
             }
             
-            var isOccupied = HomeLane.GetCellAt(x, y).Unit != null;
-            if (isOccupied)
+            if (HomeLane.GetCellAt(x, y).Unit != null)
             {
                 tower = null;
                 return TowerPlacementResult.CellOccupied;
             }
             
-            var doesAnyAdjacentCellHaveTowers = CheckAdjacentCellsAny(HomeLane, x, y, cell => cell.Unit is Tower);
-            if (doesAnyAdjacentCellHaveTowers)
+            if (CheckAdjacentCellsAny(HomeLane, x, y, cell => cell.Unit is Tower))
             {
                 tower = null;
                 return TowerPlacementResult.TooCloseToExistingTower;
