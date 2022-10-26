@@ -10,7 +10,7 @@ namespace GameFramework
      * subclasses, which can be instantiated by buying them via the Player functions
      * buyTower and buySoldier.
      */
-    public class Unit
+    public abstract class Unit
     {
         protected int posX = 0;
         protected int posY = 0;
@@ -33,60 +33,34 @@ namespace GameFramework
         }
 
         protected PlayerLane lane = null;
-        private Cell cell = null;
 
         /*
          * returns the the x coordinate of this unit.
          */
-        public int PosX
-        {
-            get
-            {
-                return posX;
-            }
-        }
+        public int PosX => posX;
 
         /*
          * returns the the y coordinate of this unit.
          */
-        public int PosY
-        {
-            get
-            {
-                return posY;
-            }
-        }
+        public int PosY => posY;
 
         /*
          * returns the the health of this unit.
          */
-        public int Health
-        {
-            get
-            {
-                return health;
-            }
-        }
+        public int Health => health;
 
         /*
          * returns the the type of this unit.
          */
-        public string Type
-        {
-            get
-            {
-                return type;
-            }
-        }
+        public string Type => type;
 
-
-        protected Unit(Player player, PlayerLane lane)
+        protected virtual void Initialize(Player player, PlayerLane lane)
         {
             this.player = player;
             this.lane = lane;
         }
 
-        protected Cell Cell { get => cell; set => cell = value; }
+        protected Cell Cell => lane.GetCellAt(PosX, PosY);
 
         /*
          * Automatically called by the game play. Forbidden to use as part of
@@ -94,31 +68,49 @@ namespace GameFramework
          */
         public void AttackEnemyInRange()
         {
+            if (!TryGetTarget(out var unit))
+            {
+                return;
+            }
+            
+            unit.health -= damageCaused;
+            if (unit.health > 0)
+            {
+                return;
+            }
+
+            // kill unit and award gold
+            
+            unit.health = 0;
+            unit.Cell.Unit = null;
+            lane.RemoveUnit(unit);
+            player.Earn(unit);
+            unit.posX = -1;
+            unit.posY = -1;
+        }
+
+        protected virtual bool TryGetTarget(out Unit unit)
+        {
             for (int x = posX - range; x <= posX + range; x++)
             {
                 for (int y = posY - range; y <= posY + range; y++)
                 {
                     Cell cell = lane.GetCellAt(x, y);
-                    if (cell != null)
+                    if (cell == null)
                     {
-                        Unit unit = cell.Unit;
-                        if (unit != null && unit.player != this.player && unit.health > 0)
-                        {
-                            unit.health -= damageCaused;
-                            if (unit.health <= 0)
-                            {
-                                unit.health = 0;
-                                unit.posX = -1;
-                                unit.posY = -1;
-                                cell.Unit = null;
-                                lane.RemoveUnit(unit);
-                                player.Earn(unit);
-                            }
-                            return; // only one shot per round.
-                        }
+                        continue;
+                    }
+
+                    unit = cell.Unit;
+                    if (unit != null && unit.player != player && unit.health > 0)
+                    {
+                        return true;
                     }
                 }
             }
+
+            unit = null;
+            return false;
         }
 
         /*
@@ -127,24 +119,36 @@ namespace GameFramework
          * 
          * Checks, if a move is possible and performs it.
          */
-        protected Boolean MoveTo(int x, int y)
+        protected bool MoveTo(int x, int y)
         {
             if (Math.Abs(posX-x) > speed || Math.Abs(posY-y) > speed)
             {
                 return false; // illegal move!
             }
-            Cell oldCell = lane.GetCellAt(posX, posY);
-            Cell newCell = lane.GetCellAt(x, y);
-            if (oldCell != null && newCell != null && newCell.Unit == null)
+
+            // if the cell is past the lane, we allow movement. the unit will be cleaned up in checkDestination
+            if (y < PlayerLane.HEIGHT && y >= 0)
             {
-                oldCell.Unit = null;
-                newCell.Unit = this;
-                this.cell = newCell;
-                posX = x;
-                posY = y;
-                return true;
+                // otherwise, we check if the target cell is empty, and if so, set this unit on it
+                if (lane.GetCellAt(x, y) is { Unit: null } cell)
+                {
+                    cell.Unit = this;
+                }
+                else
+                {
+                    return false;
+                }
             }
-            return false;
+            else
+            {
+                var i = 0;
+            }
+
+            Cell.Unit = null;
+            posX = x;
+            posY = y;
+            
+            return true;
         }
 
         /*
@@ -156,7 +160,7 @@ namespace GameFramework
          */
         public virtual void Move()
         {
-            if (speed > 0 && posY < PlayerLane.HEIGHT - 1)
+            if (speed > 0)
             {
                 int x = posX;
                 int y = posY;
@@ -180,13 +184,16 @@ namespace GameFramework
          */
         public void CheckDestination()
         {
-            if (speed > 0 && posY >= PlayerLane.HEIGHT - 1)
+            if (speed > 0 && posY >= PlayerLane.HEIGHT)
             {
                 player.Earn(this);
                 player.IncScore();
-                this.posX = -1;
-                this.posY = -1;
-                this.Cell.Unit = null;
+                posX = -1;
+                posY = -1;
+                if (Cell != null)
+                {
+                    Cell.Unit = null;
+                }
                 lane.RemoveUnit(this);
             }
         }

@@ -23,14 +23,14 @@ namespace AI_TowerDefense
 
         private bool fastSpeedActivated = false;
 
-        private Player playerA = new Player("A");
-        private Player playerB = new Player("B");
+        private readonly Player _playerA;
+        private readonly Player _playerB;
 
-        private PlayerLane lane1;
-        private PlayerLane lane2;
+        private readonly PlayerLane _lane1;
+        private readonly PlayerLane _lane2;
 
-        private AbstractStrategy playerAstrategy;
-        private AbstractStrategy playerBstrategy;
+        private readonly AbstractStrategy _playerAStrategy;
+        private readonly AbstractStrategy _playerBStrategy;
 
         private int turns = 0;
 
@@ -44,30 +44,25 @@ namespace AI_TowerDefense
          */
         private TowerDefense()
         {
-            lane1 = new PlayerLane(playerA, playerB);
-            lane2 = new PlayerLane(playerB, playerA);
+            _lane1 = new PlayerLane();
+            _lane2 = new PlayerLane();
+            
+            _playerA = new Player("A", _lane1, _lane2);
+            _playerB = new Player("B", _lane2, _lane1);
 
             // here you replace the selected strategy with your strategy class(es).
             // Your strategy should at least be able to beat random!
             
-            playerAstrategy = new RandomStrategyLoggerDemo(lane1, lane2, playerA);
-            playerBstrategy = new RandomStrategyLoggerDemo(lane2, lane1, playerB);
+            _playerAStrategy = new RandomStrategyLoggerDemo(_playerA);
+            _playerBStrategy = new RandomStrategyLoggerDemo(_playerB);
         }
 
-        public static TowerDefense Instance()
-        {
-            if (instance == null)
-            {
-                instance = new TowerDefense();
-            }
-
-            return instance;
-        }
+        public static TowerDefense Instance => instance ??= new TowerDefense();
 
         /*
          * prints the current game state.
          */
-        protected void PrintLanes()
+        private void PrintLanes()
         {
             Console.SetCursorPosition(0, 0);
             Console.Write("Turns: " + turns + "");
@@ -81,8 +76,8 @@ namespace AI_TowerDefense
             Console.WriteLine("Player A");
             Console.ForegroundColor = defaultColor;
 
-            Console.WriteLine("Score: " + playerA.Score + clearSpaces);
-            Console.WriteLine("Gold:  " + playerA.Gold + clearSpaces);
+            Console.WriteLine("Score: " + _playerA.Score + clearSpaces);
+            Console.WriteLine("Gold:  " + _playerA.Gold + clearSpaces);
 
             Console.SetCursorPosition(35, 2);
 
@@ -91,22 +86,22 @@ namespace AI_TowerDefense
             Console.ForegroundColor = defaultColor;
 
             Console.SetCursorPosition(35, 3);
-            Console.WriteLine("Score: " + playerB.Score + clearSpaces);
+            Console.WriteLine("Score: " + _playerB.Score + clearSpaces);
 
             Console.SetCursorPosition(35, 4);
-            Console.WriteLine("Gold:  " + playerB.Gold + clearSpaces);
+            Console.WriteLine("Gold:  " + _playerB.Gold + clearSpaces);
             Console.WriteLine("");
 
             for (int y = 0; y < PlayerLane.HEIGHT; y++)
             {
                 for (int x = 0; x < PlayerLane.WIDTH; x++)
                 {
-                    lane1.GetCellAt(x, y).PrintCell();
+                    _lane1.GetCellAt(x, y).PrintCell();
                 }
                 Console.Write("| +++ ");
                 for (int x = 0; x < PlayerLane.WIDTH; x++)
                 {
-                    lane2.GetCellAt(x, PlayerLane.HEIGHT - y - 1).PrintCell();
+                    _lane2.GetCellAt(x, PlayerLane.HEIGHT - y - 1).PrintCell();
                 }
                 Console.WriteLine("|");
             }
@@ -127,76 +122,44 @@ namespace AI_TowerDefense
                 }
 
                 turns++;
-                playerAstrategy.DeployTowers();
-                playerBstrategy.DeployTowers();
-                playerAstrategy.DeploySoldiers();
-                playerBstrategy.DeploySoldiers();
+                _playerAStrategy.DeployTowers();
+                _playerBStrategy.DeployTowers();
+                _playerAStrategy.DeploySoldiers();
+                _playerBStrategy.DeploySoldiers();
 
                 PrintLanes();
                 Thread.Sleep(this.fastSpeedActivated ? FAST_SPEED_MS : NORMAL_SPEED_MS);
 
-                lane1.SoldierAction();
-                lane2.SoldierAction();
-                lane1.TowerAction();
-                lane2.TowerAction();
+                _lane1.SoldierAction();
+                _lane2.SoldierAction();
+                _lane1.TowerAction();
+                _lane2.TowerAction();
 
-                playerA.Earn();
-                playerB.Earn();
+                _playerA.Earn();
+                _playerB.Earn();
 
                 PrintLanes();
 
-                DebugLoger.RenderCache();
+                DebugLogger.RenderCache();
                 Thread.Sleep(this.fastSpeedActivated ? FAST_SPEED_MS : NORMAL_SPEED_MS);
             }
 
             Console.ReadKey();
         }
 
-        public static Soldier CreateSoldier(Player player, PlayerLane lane, int x)
-        {
-            if ("A".Equals(player.Name))
-            {
-                return CreatePlayerASoldier(player, lane, x);
-            }
-            if ("B".Equals(player.Name))
-            {
-                return CreatePlayerBSoldier(player, lane, x);
-            }
-            return null;
-        }
-
-
-        /*
-         * creates a new Soldier for player A (player A uses Soldier), adapt class used for your test runs.
-         */
-        protected static Soldier CreatePlayerASoldier(Player player, PlayerLane lane, int x)
-        {
-            Soldier soldier = new MySoldier(player, lane, x);
-            return soldier;
-        }
-
-        /*
-         * creates a new Soldier for player B (player B uses MySoldier), adapt class used for your test runs.
-         */
-        protected static Soldier CreatePlayerBSoldier(Player player, PlayerLane lane, int x)
-        {
-            Soldier soldier = new MySoldier(player, lane, x);
-            return soldier;
-        }
-
 
         /*
          * called by the game play environment. Forbidden to use directly.
          */
-        public static List<Soldier> SortedSoldierArray(Player player, List<Soldier> unsortedList)
+        public List<Soldier> SortedSoldierArray(PlayerLane lane, List<Soldier> unsortedList)
         {
-            if ("A".Equals(player.Name))
+            if (_playerA.EnemyLane == lane)
             {
-                return instance.playerAstrategy.SortedSoldierArray(unsortedList);
+                return _playerAStrategy.SortedSoldierArray(unsortedList);
             }
-            if ("B".Equals(player.Name))
+            if (_playerB.EnemyLane == lane)
             {
-                return instance.playerBstrategy.SortedSoldierArray(unsortedList);
+                return _playerBStrategy.SortedSoldierArray(unsortedList);
             }
             return unsortedList;
         }

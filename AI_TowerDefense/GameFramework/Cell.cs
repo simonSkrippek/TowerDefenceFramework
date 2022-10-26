@@ -8,10 +8,9 @@ namespace GameFramework
      */
     public class Cell
     {
-        private Unit unit = null;
         private PlayerLane lane = null;
-        private int posX;
-        private int posY;
+        private readonly int posX;
+        private readonly int posY;
 
         /*
          * Automatically called by the game play. Forbidden to use as part of
@@ -29,29 +28,17 @@ namespace GameFramework
         /*
          * returns the unit positioned in this Cell.
          */
-        public Unit Unit { get => unit; set => unit = value; }
+        public Unit Unit { get; set; } = null;
 
         /*
          * returns the the x coordinate of this cell.
          */
-        public int PosX
-        {
-            get
-            {
-                return posX;
-            }
-        }
+        public int PosX => posX;
 
         /*
          * returns the the y coordinate of this cell.
          */
-        public int PosY
-        {
-            get
-            {
-                return posY;
-            }
-        }
+        public int PosY => posY;
 
         /*
          * Automatically called by the game play. Forbidden to use as part of
@@ -64,7 +51,7 @@ namespace GameFramework
             ConsoleColor defaultColor = Console.ForegroundColor;
 
             Console.Write("|");
-            if (unit == null)
+            if (Unit == null)
             {
                 if (this.posY < PlayerLane.HEIGHT_OF_SAFETY_ZONE)
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -75,7 +62,7 @@ namespace GameFramework
             }
             else
             {
-                unit.Print();
+                Unit.Print();
             }
         }
     }

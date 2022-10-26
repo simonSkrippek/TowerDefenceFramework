@@ -18,11 +18,20 @@
          */
         public static int GetNextTowerCosts(PlayerLane lane)
         {
-            return Tower.COSTS + lane.TowerCount();
+            return COSTS + lane.TowerCount();
+        }
+        
+        public static TTower CreateTower<TTower> (Player player, PlayerLane lane, int x, int y) where TTower : Tower, new()
+        {
+            var tower = new TTower();
+            tower.Initialize(player, lane, x, y);
+            return tower;
         }
 
-        public Tower(Player player, PlayerLane lane, int x, int y) : base(player, lane)
+        protected void Initialize(Player player, PlayerLane lane, int x, int y)
         {
+            base.Initialize(player, lane);
+            
             speed = 0;
             health = 9;
             damageCaused = 2;

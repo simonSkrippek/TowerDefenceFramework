@@ -12,7 +12,7 @@ namespace AI_Strategy
         private int messageCounter = 1;
         private static Random random = new Random();
 
-        public RandomStrategyLoggerDemo(PlayerLane defendLane, PlayerLane attackLane, Player player) : base(defendLane, attackLane, player)
+        public RandomStrategyLoggerDemo(Player player) : base(player)
         {
         }
 
@@ -24,17 +24,17 @@ namespace AI_Strategy
         {
             if (player.Gold > 8)
             {
-                Boolean positioned = false;
+                bool positioned = false;
                 int count = 0;
                 while (!positioned && count < 20)
                 {
                     count++;
                     int x = random.Next(PlayerLane.WIDTH);
                     int y = random.Next(PlayerLane.HEIGHT - PlayerLane.HEIGHT_OF_SAFETY_ZONE) + PlayerLane.HEIGHT_OF_SAFETY_ZONE;
-                    if (defendLane.GetCellAt(x, y).Unit == null)
+                    if (player.HomeLane.GetCellAt(x, y).Unit == null)
                     {
                         positioned = true;
-                        Tower tower = player.BuyTower(defendLane, x, y);
+                        player.TryBuyTower<Tower>(x, y);
                     }
                 }
             }
@@ -48,12 +48,12 @@ namespace AI_Strategy
         {
 
           //DebugLoger.Log(Tower.GetNextTowerCosts(defendLane));
-            DebugLoger.Log("#" + messageCounter + " Deployed Soldier!");
+            DebugLogger.Log("#" + messageCounter + " Deployed Soldier!");
             messageCounter++;
 
-            while (messageCounter > 5 && messageCounter <= 15)
+            while (messageCounter is > 5 and <= 15)
             {
-                DebugLoger.Log("#" + messageCounter + " " + random.Next(1000), true);
+                DebugLogger.Log("#" + messageCounter + " " + random.Next(1000), true);
                 //DebugLoger.Log("#" + messageCounter + ": " + random.Next(1000));
                 messageCounter++;
 
@@ -64,17 +64,17 @@ namespace AI_Strategy
             while (player.Gold > 5 && round < 5)
             {
                 round++;
-                Boolean positioned = false;
+                bool positioned = false;
                 int count = 0;
                 while (!positioned && count < 10)
                 {
                     count++;
                     int x = random.Next(PlayerLane.WIDTH);
                     int y = 0;
-                    if (attackLane.GetCellAt(x, y).Unit == null)
+                    if (player.EnemyLane.GetCellAt(x, y).Unit == null)
                     {
                         positioned = true;
-                        Soldier soldier = player.BuySoldier(attackLane, x);
+                        player.TryBuySoldier<MySoldier>(x, out var soldier);
                     }
                 }
             }

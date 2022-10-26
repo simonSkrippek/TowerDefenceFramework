@@ -5,32 +5,32 @@ using AI_TowerDefense;
 
 namespace GameFramework
 {
-    public static class DebugLoger
+    public static class DebugLogger
     {
         private static LogCache logCache = new LogCache(TowerDefense.DISPLAY_LOG_MESSAGES);
 
         public static void Log(double message, bool renderDirectly = false)
         {
-            DebugLoger.Log(message.ToString(), renderDirectly);
+            DebugLogger.Log(message.ToString(), renderDirectly);
         }
 
         public static void Log(float message, bool renderDirectly = false)
         {
-            DebugLoger.Log(message.ToString(), renderDirectly);
+            DebugLogger.Log(message.ToString(), renderDirectly);
         }
 
         public static void Log(int message, bool renderDirectly = false)
         {
-            DebugLoger.Log(message.ToString(), renderDirectly);
+            DebugLogger.Log(message.ToString(), renderDirectly);
         }
 
         public static void Log(string message, bool renderDirectly = false)
         {
-            DebugLoger.logCache.Log(message);
-            DebugLoger.WriteToFile(message);
+            DebugLogger.logCache.Log(message);
+            DebugLogger.WriteToFile(message);
 
             if (renderDirectly)
-                DebugLoger.RenderCache();
+                DebugLogger.RenderCache();
         }
 
         private static void WriteToFile(string message)
@@ -59,7 +59,7 @@ namespace GameFramework
                     Console.SetCursorPosition(68, row + 2);
                     Console.Write("                                                  ");
                     Console.SetCursorPosition(68, row + 2);
-                    Console.Write(DebugLoger.logCache.GetLogMessage(row));
+                    Console.Write(DebugLogger.logCache.GetLogMessage(row));
                 }
             }
         }

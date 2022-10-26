@@ -7,16 +7,12 @@ namespace AI_Strategy
      */
     public class MySoldier : Soldier
     {
-        public MySoldier(Player player, PlayerLane lane, int x) : base(player, lane, x)
-        {
-        }
-
         /*
          * This move method is a mere copy of the base movement method.
          */
         public override void Move()
         {
-            if (speed > 0 && posY < PlayerLane.HEIGHT - 1)
+            if (speed > 0 && posY < PlayerLane.HEIGHT)
             {
                 int x = posX;
                 int y = posY;

@@ -1,4 +1,5 @@
 ﻿using System;
+using AI_Strategy;
 
 namespace GameFramework
 {
@@ -48,6 +49,9 @@ namespace GameFramework
                 return score;
             }
         }
+        
+        public PlayerLane HomeLane { get; }
+        public PlayerLane EnemyLane { get; }
 
         /*
          * Automatically called by the game play. Forbidden to use as part of
@@ -55,9 +59,11 @@ namespace GameFramework
          * 
          * creates a new player.
          */
-        public Player(string name)
+        public Player(string name, PlayerLane homeLane, PlayerLane targetLane)
         {
             this.name = name;
+            HomeLane = homeLane;
+            EnemyLane = targetLane;
         }
 
         /*
@@ -66,7 +72,7 @@ namespace GameFramework
          * 
          * pays the new unit, if budget is sufficient.
          */
-        protected Boolean BuyUnit(int cost)
+        protected bool TryPayCost(int cost)
         {
             if (gold >= cost)
             {
@@ -84,25 +90,34 @@ namespace GameFramework
          * soldier is empty.
          * 
          * If the soldier is placed outside the soldier deploy lane, or on
-         * an non-empty field, null is returned.
+         * an non-empty field, false is returned.
          */
-        public Soldier BuySoldier(PlayerLane lane, int x)
+        public bool TryBuySoldier<TSoldier>(int x) where TSoldier : Soldier, new() => TryBuySoldier<TSoldier>( x, out _);
+        public bool TryBuySoldier<TSoldier>(int x, out TSoldier soldier) where TSoldier : Soldier, new()
         {
-            if (x < 0 || x > PlayerLane.WIDTH || lane.GetCellAt(x, 0).Unit != null)
+            if (x < 0 || x > PlayerLane.WIDTH || EnemyLane.GetCellAt(x, 0).Unit != null)
             {
-                return null;
+                soldier = null;
+                return false;
             }
 
-            Soldier soldier = AI_TowerDefense.TowerDefense.CreateSoldier(this, lane, x);
-            if (BuyUnit(soldier.Cost))
+            soldier = Soldier.CreateSoldier<TSoldier>(this, EnemyLane, x);
+            if (!TryPayCost(soldier.Cost))
             {
-                lane.GetCellAt(x, 0).Unit = soldier;
-                lane.AddUnit(soldier);
-                return soldier;
+                return false;
             }
-            return null;
+
+            EnemyLane.GetCellAt(x, 0).Unit = soldier;
+            EnemyLane.AddUnit(soldier);
+            return true;
         }
 
+        public enum TowerPlacementResult
+        {
+            Success,
+            CellOccupied,
+            CellForbidden,
+        }
         /*
          * Towers can be placed anywhere in the field, except the opponent's
          * soldier deploy lane, which is at y = 0.
@@ -113,29 +128,33 @@ namespace GameFramework
          * If the tower is placed outside the lane, inside the safety zone, or on
          * an non-empty field, null is returned.
          */
-        public Tower BuyTower(PlayerLane lane, int x, int y)
+        public bool TryBuyTower<TTower>(int x, int y) where TTower : Tower, new() => TryBuyTower<TTower>(x, y, out _);
+        public bool TryBuyTower<TTower>(int x, int y, out TTower tower) where TTower : Tower, new()
         {
-            if
-            (
-                y >= PlayerLane.HEIGHT_OF_SAFETY_ZONE && y < PlayerLane.HEIGHT &&
-                x >= 0 && x < PlayerLane.WIDTH &&
-                lane.GetCellAt(x, y).Unit == null &&
-                (y % 2) != 0 && (x % 2) == 0 // Towers allowed on od colls (counted, not index wise)
-                //(y % 2) != 0 && (x % 2) != 0 // Towsers allowed on even colls (counted, not index wise)
-            )
+            var isOutOfBounds = 
+                y < PlayerLane.HEIGHT_OF_SAFETY_ZONE 
+                || y >= PlayerLane.HEIGHT 
+                || x < 0 
+                || x >= PlayerLane.WIDTH;
+            var isOccupied = HomeLane.GetCellAt(x, y).Unit != null;
+            // || y % 2 == 0 
+            // || x % 2 != 0
+            if (isOutOfBounds || isOccupied)
             {
-                Tower tower = new Tower(this, lane, x, y);
-                if (BuyUnit(tower.Cost + lane.TowerCount()))
-                {
-                    lane.GetCellAt(x, y).Unit = tower;
-                    lane.AddUnit(tower);
-                    return tower;
-                }
-                return null;
+                tower = null;
+                return false;
             }
 
-            else
-                return null;
+            tower = Tower.CreateTower<TTower>(this, HomeLane, x, y);
+            if (!TryPayCost(Tower.GetNextTowerCosts(HomeLane)))
+            {
+                return false;
+            }
+
+            HomeLane.GetCellAt(x, y).Unit = tower;
+            HomeLane.AddUnit(tower);
+            return true;
+
         }
 
         /*

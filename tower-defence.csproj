@@ -9,6 +9,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,13 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="AI_TowerDefense\.DS_Store" />
-    <None Include="AI_TowerDefense\.vs\AI_TowerDefense\v16\.suo" />
-    <None Include="AI_TowerDefense\.vs\ProjectSettings.json" />
-    <None Include="AI_TowerDefense\.vs\slnx.sqlite" />
-    <None Include="AI_TowerDefense\.vs\VSWorkspaceState.json" />
-    <None Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.deps.json" />
-    <None Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.runtimeconfig.dev.json" />
-    <None Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.runtimeconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AI_TowerDefense\AI_Strategy\AbstractStrategy.cs" />
@@ -57,8 +51,8 @@
     <Compile Include="AI_TowerDefense\AI_Strategy\RandomStrategy.cs" />
     <Compile Include="AI_TowerDefense\AI_Strategy\RandomStrategyLoggerDemo.cs" />
     <Compile Include="AI_TowerDefense\GameFramework\Cell.cs" />
-    <Compile Include="AI_TowerDefense\GameFramework\Loging\DebugLoger.cs" />
-    <Compile Include="AI_TowerDefense\GameFramework\Loging\LogCache.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\Logging\DebugLogger.cs" />
+    <Compile Include="AI_TowerDefense\GameFramework\Logging\LogCache.cs" />
     <Compile Include="AI_TowerDefense\GameFramework\Player.cs" />
     <Compile Include="AI_TowerDefense\GameFramework\PlayerLane.cs" />
     <Compile Include="AI_TowerDefense\GameFramework\Soldier.cs" />
@@ -66,11 +60,6 @@
     <Compile Include="AI_TowerDefense\GameFramework\Unit.cs" />
     <Compile Include="AI_TowerDefense\Program.cs" />
     <Compile Include="AI_TowerDefense\TowerDefense.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.dll" />
-    <Content Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\AI_TowerDefense.exe" />
-    <Content Include="AI_TowerDefense\bin\Debug\netcoreapp3.0\logs.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>

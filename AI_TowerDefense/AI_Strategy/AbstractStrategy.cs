@@ -8,14 +8,10 @@ namespace AI_Strategy
      */
     public abstract class AbstractStrategy
     {
-        protected PlayerLane defendLane = null;
-        protected PlayerLane attackLane = null;
         protected Player player = null;
 
-        protected AbstractStrategy(PlayerLane defendLane, PlayerLane attackLane, Player player)
+        protected AbstractStrategy(Player player)
         {
-            this.defendLane = defendLane;
-            this.attackLane = attackLane;
             this.player = player;
         }
 

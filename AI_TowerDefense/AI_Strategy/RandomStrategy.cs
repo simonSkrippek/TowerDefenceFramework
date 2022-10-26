@@ -11,8 +11,9 @@ namespace AI_Strategy
     {
         private static Random random = new Random();
 
-        public RandomStrategy(PlayerLane defendLane, PlayerLane attackLane, Player player) : base(defendLane, attackLane, player)
+        public RandomStrategy(Player player) : base(player)
         {
+            
         }
 
         /*
@@ -30,10 +31,10 @@ namespace AI_Strategy
                     count++;
                     int x = random.Next(PlayerLane.WIDTH);
                     int y = random.Next(PlayerLane.HEIGHT - 1) + 1; // has to leave soldier deploy lane empty
-                    if (defendLane.GetCellAt(x, y).Unit == null)
+                    if (player.HomeLane.GetCellAt(x, y).Unit == null)
                     {
                         //positioned = true;
-                        Tower tower = player.BuyTower(defendLane, x, y);
+                        player.TryBuyTower<Tower>(x, y);
                     }
                 }
             }
@@ -49,17 +50,17 @@ namespace AI_Strategy
             while (player.Gold > 5 && round < 5)
             {
                 round++;
-                Boolean positioned = false;
+                bool positioned = false;
                 int count = 0;
                 while (!positioned && count < 10)
                 {
                     count++;
                     int x = random.Next(PlayerLane.WIDTH);
                     int y = 0;
-                    if (attackLane.GetCellAt(x, y).Unit == null)
+                    if (player.EnemyLane.GetCellAt(x, y).Unit == null)
                     {
                         positioned = true;
-                        Soldier soldier = player.BuySoldier(attackLane, x);
+                        player.TryBuySoldier<MySoldier>(x);
                     }
                 }
             }

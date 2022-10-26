@@ -17,9 +17,6 @@ namespace GameFramework
 
         public static readonly int HEIGHT_OF_SAFETY_ZONE = 3;
 
-        protected Player defenderPlayer;
-        protected Player attackerPlayer;
-
         protected Cell[,] cells = new Cell[WIDTH, HEIGHT];
 
         protected List<Tower> towers = new List<Tower>();
@@ -34,11 +31,8 @@ namespace GameFramework
          * PlayerLane
          * 
          */
-        public PlayerLane(Player defenderPlayer, Player attackerPlayer)
+        public PlayerLane()
         {
-            this.defenderPlayer = defenderPlayer;
-            this.attackerPlayer = attackerPlayer;
-
             for (int x = 0; x < WIDTH; x++)
             {
                 for (int y = 0; y < HEIGHT; y++)
@@ -87,13 +81,13 @@ namespace GameFramework
          */
         public void RemoveUnit(Unit unit)
         {
-            if (unit is Soldier)
+            if (unit is Soldier soldier)
             {
-                soldiers.Remove((Soldier)unit);
+                soldiers.Remove(soldier);
             }
-            else if (unit is Tower)
+            else if (unit is Tower tower)
             {
-                towers.Remove((Tower)unit);
+                towers.Remove(tower);
             }
         }
 
@@ -133,7 +127,7 @@ namespace GameFramework
          */
         public void SoldierAction()
         {
-            List<Soldier> sortedSoldiers = TowerDefense.SortedSoldierArray(attackerPlayer, soldiers);
+            List<Soldier> sortedSoldiers = TowerDefense.Instance.SortedSoldierArray(this, soldiers);
             foreach (Soldier soldier in sortedSoldiers.ToArray())
             {
                 soldier.AttackEnemyInRange();

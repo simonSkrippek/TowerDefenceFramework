@@ -7,7 +7,7 @@
          */
         static void Main(string[] args)
         {
-            TowerDefense towerDefense = TowerDefense.Instance();
+            TowerDefense towerDefense = TowerDefense.Instance;
             towerDefense.RunGame();
         }
     }
