@@ -50,6 +50,7 @@
     <Compile Include="AI_TowerDefense\AI_Strategy\MySoldier.cs" />
     <Compile Include="AI_TowerDefense\AI_Strategy\RandomStrategy.cs" />
     <Compile Include="AI_TowerDefense\AI_Strategy\RandomStrategyLoggerDemo.cs" />
+    <Compile Include="AI_TowerDefense\AI_Strategy\TowerPlacementTestStrategy.cs" />
     <Compile Include="AI_TowerDefense\GameFramework\Cell.cs" />
     <Compile Include="AI_TowerDefense\GameFramework\Logging\DebugLogger.cs" />
     <Compile Include="AI_TowerDefense\GameFramework\Logging\LogCache.cs" />

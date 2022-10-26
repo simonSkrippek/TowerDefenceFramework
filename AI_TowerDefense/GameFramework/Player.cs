@@ -82,6 +82,13 @@ namespace GameFramework
             return false;
         }
 
+        public enum SoldierPlacementResult
+        {
+            Success,
+            CellOccupied,
+            OutOfBounds,
+            NotEnoughGold,
+        }
         /*
          * Soldiers will always be placed on the soldier deploy lane, which is
          * at y=0. The buyer can select the x position.
@@ -92,31 +99,39 @@ namespace GameFramework
          * If the soldier is placed outside the soldier deploy lane, or on
          * an non-empty field, false is returned.
          */
-        public bool TryBuySoldier<TSoldier>(int x) where TSoldier : Soldier, new() => TryBuySoldier<TSoldier>( x, out _);
-        public bool TryBuySoldier<TSoldier>(int x, out TSoldier soldier) where TSoldier : Soldier, new()
+        public SoldierPlacementResult TryBuySoldier<TSoldier>(int x) where TSoldier : Soldier, new() => TryBuySoldier<TSoldier>( x, out _);
+        public SoldierPlacementResult TryBuySoldier<TSoldier>(int x, out TSoldier soldier) where TSoldier : Soldier, new()
         {
-            if (x < 0 || x > PlayerLane.WIDTH || EnemyLane.GetCellAt(x, 0).Unit != null)
+            if (x < 0 || x > PlayerLane.WIDTH)
             {
                 soldier = null;
-                return false;
+                return SoldierPlacementResult.OutOfBounds;
+            }
+
+            if (EnemyLane.GetCellAt(x, 0).Unit != null)
+            {
+                soldier = null;
+                return SoldierPlacementResult.CellOccupied;
             }
 
             soldier = Soldier.CreateSoldier<TSoldier>(this, EnemyLane, x);
             if (!TryPayCost(soldier.Cost))
             {
-                return false;
+                return SoldierPlacementResult.NotEnoughGold;
             }
 
             EnemyLane.GetCellAt(x, 0).Unit = soldier;
             EnemyLane.AddUnit(soldier);
-            return true;
+            return SoldierPlacementResult.Success;
         }
 
         public enum TowerPlacementResult
         {
             Success,
             CellOccupied,
-            CellForbidden,
+            TooCloseToExistingTower,
+            OutOfBounds,
+            NotEnoughGold,
         }
         /*
          * Towers can be placed anywhere in the field, except the opponent's
@@ -128,33 +143,39 @@ namespace GameFramework
          * If the tower is placed outside the lane, inside the safety zone, or on
          * an non-empty field, null is returned.
          */
-        public bool TryBuyTower<TTower>(int x, int y) where TTower : Tower, new() => TryBuyTower<TTower>(x, y, out _);
-        public bool TryBuyTower<TTower>(int x, int y, out TTower tower) where TTower : Tower, new()
+        public TowerPlacementResult TryBuyTower<TTower>(int x, int y) where TTower : Tower, new() => TryBuyTower<TTower>(x, y, out _);
+        public TowerPlacementResult TryBuyTower<TTower>(int x, int y, out TTower tower) where TTower : Tower, new()
         {
-            var isOutOfBounds = 
-                y < PlayerLane.HEIGHT_OF_SAFETY_ZONE 
+            if (y < PlayerLane.HEIGHT_OF_SAFETY_ZONE 
                 || y >= PlayerLane.HEIGHT 
                 || x < 0 
-                || x >= PlayerLane.WIDTH;
-            var isOccupied = HomeLane.GetCellAt(x, y).Unit != null;
-            // || y % 2 == 0 
-            // || x % 2 != 0
-            if (isOutOfBounds || isOccupied)
+                || x >= PlayerLane.WIDTH)
             {
                 tower = null;
-                return false;
+                return TowerPlacementResult.OutOfBounds;
+            }
+            
+            if (HomeLane.GetCellAt(x, y).Unit != null)
+            {
+                tower = null;
+                return TowerPlacementResult.CellOccupied;
+            }
+            
+            if (CheckAdjacentCellsAny(HomeLane, x, y, cell => cell.Unit is Tower))
+            {
+                tower = null;
+                return TowerPlacementResult.TooCloseToExistingTower;
             }
 
             tower = Tower.CreateTower<TTower>(this, HomeLane, x, y);
             if (!TryPayCost(Tower.GetNextTowerCosts(HomeLane)))
             {
-                return false;
+                return TowerPlacementResult.NotEnoughGold;
             }
 
             HomeLane.GetCellAt(x, y).Unit = tower;
             HomeLane.AddUnit(tower);
-            return true;
-
+            return TowerPlacementResult.Success;
         }
 
         /*
@@ -188,6 +209,25 @@ namespace GameFramework
         public void IncScore()
         {
             score++;
+        }
+        
+        public bool CheckAdjacentCellsAny(PlayerLane lane, int x, int y, Func<Cell, bool> predicate)
+        {
+            return
+                (lane.GetCellAt(x + 1, y) is {} cell_right && predicate(cell_right))
+                || (lane.GetCellAt(x, y - 1) is {} cell_down && predicate(cell_down)) 
+                || (lane.GetCellAt(x - 1, y) is {} cell_left && predicate(cell_left)) 
+                || (lane.GetCellAt(x, y + 1) is {} cell_up && predicate(cell_up))
+                ;
+        }
+        public bool CheckAdjacentCellsAll(PlayerLane lane, int x, int y, Func<Cell, bool> predicate)
+        {
+            return
+                (lane.GetCellAt(x + 1, y) is not {} cell_right || predicate(cell_right))
+                && (lane.GetCellAt(x, y - 1) is not {} cell_down || predicate(cell_down)) 
+                && (lane.GetCellAt(x - 1, y) is not {} cell_left || predicate(cell_left)) 
+                && (lane.GetCellAt(x, y + 1) is not {} cell_up || predicate(cell_up))
+                ;
         }
     }
 }
