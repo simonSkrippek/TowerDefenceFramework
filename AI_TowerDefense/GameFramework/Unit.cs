@@ -143,8 +143,9 @@ namespace GameFramework
             {
                 var i = 0;
             }
-
-            Cell.Unit = null;
+    
+            if(Cell != null)
+                Cell.Unit = null;
             posX = x;
             posY = y;
             
